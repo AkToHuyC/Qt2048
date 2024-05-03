@@ -1,23 +1,19 @@
-#include "mainwindow.h"
-
 #include <QApplication>
-#include <QLocale>
-#include <QTranslator>
+#include <QWidget>
+#include <QKeyEvent>
+#include <QGridLayout>
+#include <QLabel>
+#include <QDebug>
+#include <QRandomGenerator>
+#include <QVector>
+#include "qt2048.h"
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
 
-    QTranslator translator;
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-    for (const QString &locale : uiLanguages) {
-        const QString baseName = "Qt2048_" + QLocale(locale).name();
-        if (translator.load(":/i18n/" + baseName)) {
-            a.installTranslator(&translator);
-            break;
-        }
-    }
-    MainWindow w;
-    w.show();
-    return a.exec();
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    Game2048 game;
+    game.show();
+    return app.exec();
 }
+
+#include "main.moc"
