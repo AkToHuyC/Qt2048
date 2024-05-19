@@ -1,9 +1,65 @@
 #include "qt2048.h"
 
-Tile::Tile(QWidget* parent) : QLabel(parent) {
+Tile::Tile(QWidget* parent) : QLabel(parent), value(0) {
     setText("");
     setAlignment(Qt::AlignCenter);
-    setStyleSheet("QLabel { background-color : lightgray; border-radius: 5px; font-size: 24px; font-weight: bold;}");
+    updateColor();
+}
+
+void Tile::setTileValue(int value) {
+    this->value = value;
+    if (value == 0) {
+        setText("");
+    } else {
+        setText(QString::number(value));
+    }
+    updateColor();
+}
+
+void Tile::updateColor() {
+    QString color;
+    switch (value) {
+    case 0:
+        color = "lightgray";
+        break;
+    case 2:
+        color = "#eee4da";
+        break;
+    case 4:
+        color = "#ede0c8";
+        break;
+    case 8:
+        color = "#f2b179";
+        break;
+    case 16:
+        color = "#f59563";
+        break;
+    case 32:
+        color = "#f67c5f";
+        break;
+    case 64:
+        color = "#f65e3b";
+        break;
+    case 128:
+        color = "#edcf72";
+        break;
+    case 256:
+        color = "#edcc61";
+        break;
+    case 512:
+        color = "#edc850";
+        break;
+    case 1024:
+        color = "#edc53f";
+        break;
+    case 2048:
+        color = "#edc22e";
+        break;
+    default:
+        color = "black";
+        break;
+    }
+    setStyleSheet(QString("QLabel { background-color : %1; border-radius: 5px; font-size: 24px; font-weight: bold; }").arg(color));
 }
 
 Game2048::Game2048(QWidget* parent) : QWidget(parent), score(0) {
@@ -42,7 +98,7 @@ void Game2048::generateRandomTile() {
     }
 
     int value = QRandomGenerator::global()->bounded(10) == 0 ? 4 : 2;
-    tiles[x][y]->setText(QString::number(value));
+    tiles[x][y]->setTileValue(value);
 }
 
 void Game2048::updateScore(int value) {
@@ -58,15 +114,15 @@ void Game2048::moveLeft() {
             if (tiles[i][j]->text() != "") {
                 int k = j;
                 while (k > 0 && tiles[i][k - 1]->text() == "") {
-                    tiles[i][k - 1]->setText(tiles[i][k]->text());
-                    tiles[i][k]->setText("");
+                    tiles[i][k - 1]->setTileValue(tiles[i][k]->text().toInt());
+                    tiles[i][k]->setTileValue(0);
                     --k;
                     moved = true;
                 }
                 if (k > 0 && tiles[i][k - 1]->text() == tiles[i][k]->text() && merged[k - 1] == 0) {
                     int value = tiles[i][k]->text().toInt() * 2;
-                    tiles[i][k - 1]->setText(QString::number(value));
-                    tiles[i][k]->setText("");
+                    tiles[i][k - 1]->setTileValue(value);
+                    tiles[i][k]->setTileValue(0);
                     merged[k - 1] = 1;
                     updateScore(value);
                     moved = true;
@@ -85,15 +141,15 @@ void Game2048::moveRight() {
             if (tiles[i][j]->text() != "") {
                 int k = j;
                 while (k < 3 && tiles[i][k + 1]->text() == "") {
-                    tiles[i][k + 1]->setText(tiles[i][k]->text());
-                    tiles[i][k]->setText("");
+                    tiles[i][k + 1]->setTileValue(tiles[i][k]->text().toInt());
+                    tiles[i][k]->setTileValue(0);
                     ++k;
                     moved = true;
                 }
                 if (k < 3 && tiles[i][k + 1]->text() == tiles[i][k]->text() && merged[k + 1] == 0) {
                     int value = tiles[i][k]->text().toInt() * 2;
-                    tiles[i][k + 1]->setText(QString::number(value));
-                    tiles[i][k]->setText("");
+                    tiles[i][k + 1]->setTileValue(value);
+                    tiles[i][k]->setTileValue(0);
                     merged[k + 1] = 1;
                     updateScore(value);
                     moved = true;
@@ -112,15 +168,15 @@ void Game2048::moveUp() {
             if (tiles[i][j]->text() != "") {
                 int k = i;
                 while (k > 0 && tiles[k - 1][j]->text() == "") {
-                    tiles[k - 1][j]->setText(tiles[k][j]->text());
-                    tiles[k][j]->setText("");
+                    tiles[k - 1][j]->setTileValue(tiles[k][j]->text().toInt());
+                    tiles[k][j]->setTileValue(0);
                     --k;
                     moved = true;
                 }
                 if (k > 0 && tiles[k - 1][j]->text() == tiles[k][j]->text() && merged[k - 1] == 0) {
                     int value = tiles[k][j]->text().toInt() * 2;
-                    tiles[k - 1][j]->setText(QString::number(value));
-                    tiles[k][j]->setText("");
+                    tiles[k - 1][j]->setTileValue(value);
+                    tiles[k][j]->setTileValue(0);
                     merged[k - 1] = 1;
                     updateScore(value);
                     moved = true;
@@ -139,15 +195,15 @@ void Game2048::moveDown() {
             if (tiles[i][j]->text() != "") {
                 int k = i;
                 while (k < 3 && tiles[k + 1][j]->text() == "") {
-                    tiles[k + 1][j]->setText(tiles[k][j]->text());
-                    tiles[k][j]->setText("");
+                    tiles[k + 1][j]->setTileValue(tiles[k][j]->text().toInt());
+                    tiles[k][j]->setTileValue(0);
                     ++k;
                     moved = true;
                 }
                 if (k < 3 && tiles[k + 1][j]->text() == tiles[k][j]->text() && merged[k + 1] == 0) {
                     int value = tiles[k][j]->text().toInt() * 2;
-                    tiles[k + 1][j]->setText(QString::number(value));
-                    tiles[k][j]->setText("");
+                    tiles[k + 1][j]->setTileValue(value);
+                    tiles[k][j]->setTileValue(0);
                     merged[k + 1] = 1;
                     updateScore(value);
                     moved = true;

@@ -9,10 +9,14 @@
 #include <QDebug>
 #include <QLabel>
 
-
 class Tile : public QLabel {
 public:
     Tile(QWidget* parent = nullptr);
+    void setTileValue(int value);
+    void updateColor();
+
+private:
+    int value;
 };
 
 class Game2048 : public QWidget {
