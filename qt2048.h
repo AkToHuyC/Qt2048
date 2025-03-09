@@ -8,11 +8,14 @@
 #include <QVector>
 #include <QDebug>
 #include <QLabel>
+#include <QPair>
 
 class Tile : public QLabel {
+    Q_OBJECT
 public:
-    Tile(QWidget* parent = nullptr);
-    void setTileValue(int value);
+    explicit Tile(QWidget* parent = nullptr);
+    void setTileValue(int newValue);
+    int tileValue() const { return value; }
     void updateColor();
 
 private:
@@ -22,24 +25,38 @@ private:
 class Game2048 : public QWidget {
     Q_OBJECT
 public:
-    Game2048(QWidget* parent = nullptr);
+    // Здесь задаём размер поля
+    static constexpr int BOARD_SIZE = 6;
+
+    explicit Game2048(QWidget* parent = nullptr);
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
 
 private slots:
-    void moveLeft();
-    void moveRight();
-    void moveUp();
-    void moveDown();
+    void newGame();                  // перезапуск игры
 
 private:
-    void generateRandomTile();
-    void updateScore(int value);
+    enum class Direction { Left, Right, Up, Down };
 
-    Tile* tiles[4][4];
+    void generateRandomTile();
+    bool canMove() const;            // можно ли сделать хоть один ход
+    bool checkWin() const;           // достигнут ли 2048
+    void moveTiles(Direction dir);   // универсальное перемещение во все стороны
+    bool slideAndMergeLine(QVector<int> &line);
+    void copyToLine(int index, bool horizontal, QVector<int>& line) const;
+    void copyFromLine(int index, bool horizontal, const QVector<int>& line);
+    void updateScore(int val);
+    void checkGameState();
+
+    void resetBoard();               // очистка поля (для newGame)
+
+    // Храним тайлы в статическом массиве, размеры которого зависят от BOARD_SIZE
+    Tile* tiles[BOARD_SIZE][BOARD_SIZE];
     QGridLayout* gridLayout;
     int score;
+    int bestScore;
+    bool hasWon;
 };
 
 #endif // GAME2048_H
